@@ -4,10 +4,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "CognitoIdentityTest",
+    name: "CognitoIdentityDemo",
     platforms: [
         .macOS(.v10_15),
         .iOS(.v13)
+    ],
+    products: [
+        .library(
+            name: "CognitoIdentityDemo",
+            targets: [
+                "identity-demo",
+                "CognitoIdentityDemoTests"
+            ]
+        )
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -17,14 +26,22 @@ let package = Package(
     targets: [
         // The target of the main executable program
         .executableTarget(
-            name: "CognitoIdentityTest",
+            name: "identity-demo",
             dependencies: [
-                .product(name: "CognitoIdentity", package: "AWSSwiftSDK"),
+                "CognitoIdentityDemo"
             ]
         ),
         // The target of the tests
         .testTarget(
-            name: "CognitoIdentityTestTests",
-            dependencies: ["CognitoIdentityTest"]),
+            name: "CognitoIdentityDemoTests",
+            dependencies: ["identity-demo"]
+        ),
+        // A library target containing the demo's classes
+        .target(
+            name: "CognitoIdentityDemo",
+            dependencies: [
+                .product(name: "CognitoIdentity", package: "AWSSwiftSDK"),
+            ]
+        )
     ]
 )
