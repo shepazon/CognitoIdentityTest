@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/awslabs/aws-crt-swift.git",
         "state": {
           "branch": null,
-          "revision": "f6deb25e2ca38ca7258986f5b4d1c20f6884ac91",
-          "version": "0.0.6"
+          "revision": "737c445fef9078ecdd4bdcf720795044a2b02488",
+          "version": "0.0.8"
         }
       },
       {
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/awslabs/aws-sdk-swift",
         "state": {
           "branch": null,
-          "revision": "c1e0024f31e21c7f6f32a3339e2cd4ff54238bfc",
-          "version": "0.0.7"
+          "revision": "7c0fdc20bfb29a00bed51bd9653966e480617ca3",
+          "version": "0.0.9"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/awslabs/smithy-swift.git",
         "state": {
           "branch": null,
-          "revision": "617db462e00b7d33b77a80ab7fc950ba6b27d196",
-          "version": "0.0.6"
+          "revision": "f5b8aff693cf9fc37653f38fdf82a7bcfb7438fc",
+          "version": "0.0.8"
         }
       },
       {

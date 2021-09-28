@@ -6,9 +6,9 @@
 //
 
 import Foundation
-import CognitoIdentity
+import AWSCognitoIdentity
 
-class CognitoIdentityDemo {
+class CognitoIdentityFunctions {
     var cognitoIdentityClient: CognitoIdentityClient
     
     init() throws {
@@ -28,11 +28,18 @@ class CognitoIdentityDemo {
         // See if the pool already exists
         
         repeat {
-            if (token == nil) {
-                listPoolsInput = ListIdentityPoolsInput(maxResults: 25)
-            } else {
-                listPoolsInput = ListIdentityPoolsInput(maxResults: 25, nextToken: token)
-            }
+            /// `token` is a value returned by `ListIdentityPools()` if the returned list
+            /// of identity pools is only a partial list. You use the `token` to tell Cognito that
+            /// you want to continue where you left off previously; specifying `nil` or not providing
+            /// it means "start at the beginning."
+            
+            listPoolsInput = ListIdentityPoolsInput(maxResults: 25, nextToken: token)
+            
+            // Read pages of identity pools from Cognito until one is found
+            // whose name matches the one specified in the `name` parameter.
+            // Return the matching pool's ID. Each time we ask for the next
+            // page of identity pools, we pass in the token given by the
+            // previous page.
             
             cognitoIdentityClient.listIdentityPools(input: listPoolsInput) { (result) in
                 switch(result) {
