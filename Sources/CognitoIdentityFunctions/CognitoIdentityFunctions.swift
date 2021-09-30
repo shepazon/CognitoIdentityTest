@@ -35,11 +35,11 @@ class CognitoIdentityFunctions {
             
             listPoolsInput = ListIdentityPoolsInput(maxResults: 25, nextToken: token)
             
-            // Read pages of identity pools from Cognito until one is found
-            // whose name matches the one specified in the `name` parameter.
-            // Return the matching pool's ID. Each time we ask for the next
-            // page of identity pools, we pass in the token given by the
-            // previous page.
+            /// Read pages of identity pools from Cognito until one is found
+            /// whose name matches the one specified in the `name` parameter.
+            /// Return the matching pool's ID. Each time we ask for the next
+            /// page of identity pools, we pass in the token given by the
+            /// previous page.
             
             cognitoIdentityClient.listIdentityPools(input: listPoolsInput) { (result) in
                 switch(result) {
@@ -52,22 +52,33 @@ class CognitoIdentityFunctions {
                     }
                     token = output.nextToken
                 case .failure(let error):
-                    print("ERROR: ", dump(error, name: "ERROR DETAILS"))
+                    print("ERROR: ", dump(error, name: "Error scanning identity pools"))
                 }
             }
         } while(token != nil)
 
-        // If needed, create the pool
+        /// If we didn't find the pool and `createIfMissing` is `true`, create
+        /// the pool and return its ID.
         
         if (poolID == nil && createIfMissing) {
-            let cognitoInputCall = CreateIdentityPoolInput(allowClassicFlow: nil, allowUnauthenticatedIdentities: true, cognitoIdentityProviders: nil, developerProviderName: "com.amazon.CognitoIdentityDemo", identityPoolName: name, identityPoolTags: nil, openIdConnectProviderARNs: nil, samlProviderARNs: nil, supportedLoginProviders: nil)
+            let cognitoInputCall = CreateIdentityPoolInput(
+                allowClassicFlow: nil,
+                allowUnauthenticatedIdentities: true,
+                cognitoIdentityProviders: nil,
+                developerProviderName: "com.exampleco.CognitoIdentityDemo",
+                identityPoolName: name,
+                identityPoolTags: nil,
+                openIdConnectProviderARNs: nil,
+                samlProviderARNs: nil,
+                supportedLoginProviders: nil
+            )
 
             cognitoIdentityClient.createIdentityPool(input: cognitoInputCall) { (result) in
                 switch(result) {
                 case .success(let output):
                     poolID = output.identityPoolId;
                 case .failure(let error):
-                    print("ERROR: ", dump(error, name: "ERROR DETAILS"))
+                    print("ERROR: ", dump(error, name: "Error attempting to create the identity pool"))
                 }
             }
         }
