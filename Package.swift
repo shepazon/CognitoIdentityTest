@@ -4,41 +4,32 @@
 import PackageDescription
 
 let package = Package(
-    name: "CognitoIdentityDemo",
+    name: "cognito-identity-demo",
     platforms: [
         .macOS(.v10_15),
         .iOS(.v13)
     ],
- /*   products: [
-        .library(
-            name: "CognitoIdentityFunctions",
-            targets: [
-                "CognitoIdentityDemo",
-                "CognitoIdentityDemoTests"
-            ]
-        )
-    ], */
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
         .package(
             name: "AWSSwiftSDK",
             url: "https://github.com/awslabs/aws-sdk-swift",
-            from: "0.0.9"
+            from: "0.0.11"
         ),
     ],
     targets: [
         // The target of the main executable program
         .executableTarget(
-            name: "CognitoIdentityDemo",
+            name: "cognito-identity-demo",
             dependencies: [
-                "CognitoIdentityFunctions",
+                "CognitoIdentityDemo",
                 .product(name: "AWSCognitoIdentity", package: "AWSSwiftSDK"),
             ]
         ),
         // A library target containing the demo's classes
         .target(
-            name: "CognitoIdentityFunctions",
+            name: "CognitoIdentityDemo",
             dependencies: [
                 .product(name: "AWSCognitoIdentity", package: "AWSSwiftSDK"),
             ]
@@ -47,7 +38,7 @@ let package = Package(
         .testTarget(
             name: "CognitoIdentityDemoTests",
             dependencies: [
-                "CognitoIdentityDemo",
+                "cognito-identity-demo",
                 .product(name: "AWSCognitoIdentity", package: "AWSSwiftSDK"),
             ]
         ),

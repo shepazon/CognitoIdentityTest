@@ -1,15 +1,15 @@
 import XCTest
 import class Foundation.Bundle
-@testable import CognitoIdentityFunctions
+@testable import CognitoIdentityDemo
 
 /// Class based on `XCTestCase` that's run to perform testing of the project code.
 final class CognitoIdentityDemoTests: XCTestCase {
-    var identityTester: CognitoIdentityFunctions? = nil
+    var identityTester: CognitoIdentityDemo? = nil
     
     /// Perform setup work needed by all tests.
     override func setUp() {
         do {
-            identityTester = try CognitoIdentityFunctions()
+            identityTester = try CognitoIdentityDemo()
         } catch {
             dump(error, name: "Error during test setup")
             exit(1)
