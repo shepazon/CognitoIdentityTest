@@ -15,7 +15,7 @@ do {
             return
         }
 
-        print("*** Found or created SuperSpecialPool with ID \(poolID!)")
+        print("*** Found or created SuperSpecialPool with ID \(poolID)")
     }
 } catch {
     dump(error, name: "Error creating identity test object")
