@@ -3,23 +3,23 @@ import AWSCognitoIdentity
 @testable import CognitoIdentityDemo
 
 
-let identityDemo: CognitoIdentityDemo
-
 // Instantiate the main identity functions object
 
 do {
-    identityDemo = try CognitoIdentityDemo()
+    let identityDemo = try CognitoIdentityDemo()
+    // Get the ID of the identity pool, creating it if necesssary
+
+    identityDemo.getIdentityPoolID(name: "SuperSpecialPool") { poolID in
+        guard let poolID = poolID else {
+            print("*** Unable to find or create SuperSpecialPool!")
+            return
+        }
+
+        print("*** Found or created SuperSpecialPool with ID \(poolID)")
+    }
 } catch {
     dump(error, name: "Error creating identity test object")
     exit(1)
 }
 
-// Get the ID of the identity pool, creating it if necesssary
 
-let poolID = identityDemo.getIdentityPoolID(name: "SuperSpecialPool", createIfMissing: true)
-
-if (poolID == nil) {
-    print("*** Unable to find or create SuperSpecialPool!")
-} else {
-    print("*** Found or created SuperSpecialPool with ID \(poolID!)")
-}
