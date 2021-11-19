@@ -1,8 +1,8 @@
 //
-//  CognitoIdentityTest.swift
-//  
+// Copyright Amazon.com Inc. or its affiliates.
+// All Rights Reserved.
 //
-//  Created by Shepherd, Eric on 9/9/21.
+// SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation
@@ -22,10 +22,14 @@ class CognitoIdentityDemo {
         cognitoIdentityClient = try CognitoIdentityClient()
     }
     
-    /// Returns the ID of the identity pool with the specified name.
+    /// Returns the ID of the identity pool with the specified name by calling the completion handler with
+    /// the found ID.
     /// - Parameters:
     ///   - name: The name of the identity pool whose ID should be returned
     /// - Returns: A string containing the ID of the specified identity pool or `nil` on error or if not found
+    ///
+    /// - Note: The completion handler's parameters are the found ID (or `nil` if not found) and the
+    ///     next token if the search isn't finished yet.
     func getIdentityPoolID(name: String, completion: @escaping (String?) -> Void) {
         var token: String? = nil
         var poolID: String? = nil
@@ -50,12 +54,16 @@ class CognitoIdentityDemo {
                 switch(result) {
                 case .success(let output):
                     if let identityPools = output.identityPools {
-                        for pool in identityPools {
-                            if pool.identityPoolName == name,
-                               let id = pool.identityPoolId {
-                                poolID = id
-                                break
-                            }
+                        let foundID = identityPools.filter {
+                            $0.identityPoolName == name
+                        }
+                        .map {
+                            $0.identityPoolId
+                        }
+                        .first ?? nil
+                        
+                        if let foundID = foundID {
+                            poolID = foundID
                         }
                     }
                     
@@ -63,6 +71,7 @@ class CognitoIdentityDemo {
                 case .failure(let error):
                     print("ERROR: ", dump(error, name: "Error scanning identity pools"))
                     token = nil
+                    poolID = nil
                 }
             }
         } while token != nil && poolID == nil
