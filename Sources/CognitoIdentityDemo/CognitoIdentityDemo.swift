@@ -28,7 +28,7 @@ class CognitoIdentityDemo {
     /// - Returns: A string containing the ID of the specified identity pool or `nil` on error or if not found
     func getIdentityPoolID(name: String, completion: @escaping (String?) -> Void) {
         var token: String? = nil
-        var poolFound: Bool = false
+        var poolID: String? = nil
 
         // Iterate over the identity pools until a match is found.
         repeat {
@@ -52,9 +52,8 @@ class CognitoIdentityDemo {
                     if let identityPools = output.identityPools {
                         for pool in identityPools {
                             if pool.identityPoolName == name,
-                               let poolID = pool.identityPoolId {
-                                poolFound = true
-                                completion(poolID)
+                               let id = pool.identityPoolId {
+                                poolID = id
                                 break
                             }
                         }
@@ -64,14 +63,11 @@ class CognitoIdentityDemo {
                 case .failure(let error):
                     print("ERROR: ", dump(error, name: "Error scanning identity pools"))
                     token = nil
-                    completion(nil)
                 }
             }
-        } while token != nil && !poolFound
+        } while token != nil && poolID == nil
         
-        if !poolFound {
-            completion(nil)
-        }
+        completion(poolID)
     }
     
     /// Returns the ID of the identity pool with the specified name.
@@ -84,31 +80,13 @@ class CognitoIdentityDemo {
         
         self.getIdentityPoolID(name: name) { foundID in
             if let foundID = foundID {
-                print("found")
                 completion(foundID)
             } else if createIfMissing {
-                print("creating")
                 self.createIdentityPool(name: name, completion: completion)
             } else {
-                print("not found and createIfMissing is false")
                 completion(nil)
             }
         }
-        
-//        self.getIdentityPoolID(name: name) { foundID in
-//            if let foundID = foundID, createIfMissing {
-//                completion(foundID)
-//            } else {
-//                print("creating")
-//                self.createIdentityPool(name: name) { poolID in
-//                    if poolID != nil {
-//                        print("created successfully")
-//                        completion(poolID)
-//                    }
-//                    completion(nil)
-//                }
-//            }
-//        }
 }
     
     /// Create a new identity pool, returning its ID.
@@ -133,30 +111,5 @@ class CognitoIdentityDemo {
             }
         }
     }
-
-//    func createIdentityPool(name: String, completion: @escaping (String?) -> Void) {
-//
-//        let cognitoInputCall = CreateIdentityPoolInput(
-//            developerProviderName: "com.exampleco.CognitoIdentityDemo",
-//            identityPoolName: name
-//        )
-//
-//        cognitoIdentityClient.createIdentityPool(input: cognitoInputCall) { result in
-//            var poolID: String? = nil
-//
-//            switch(result) {
-//            case .success(let output):
-//                if let id = output.identityPoolId {
-//                    //completion(poolID)
-//                    poolID = id
-//                }
-//            case .failure(let error):
-//                print("ERROR: ", dump(error, name: "Error attempting to create the identity pool"))
-//                poolID = nil
-//            }
-//
-//            completion(poolID)
-//        }
-//    }
 }
 
