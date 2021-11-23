@@ -16,7 +16,7 @@ do {
     let identityDemo = try CognitoIdentityDemo()
     // Get the ID of the identity pool, creating it if necesssary
 
-    identityDemo.getIdentityPoolID(name: "SuperSpecialPool32",
+    try identityDemo.getIdentityPoolID(name: "SuperSpecialPool",
                                    createIfMissing: true) { poolID in
         guard let poolID = poolID else {
             print("*** Unable to find or create SuperSpecialPool!")

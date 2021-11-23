@@ -18,7 +18,6 @@ class CognitoIdentityDemo {
     /// used for the example.
     /// - Returns: A new ``CognitoIdentityDemo`` object, ready to run the demo code.
     init() throws {
-        SDKLoggingSystem.add(logHandlerFactory: CognitoIdentityClientLogHandlerFactory(logLevel: .info))
         cognitoIdentityClient = try CognitoIdentityClient()
     }
     
@@ -30,13 +29,14 @@ class CognitoIdentityDemo {
     ///
     /// - Note: The completion handler's parameters are the found ID (or `nil` if not found) and the
     ///     next token if the search isn't finished yet.
-    func getIdentityPoolID(name: String, completion: @escaping (String?) -> Void) {
+    func getIdentityPoolID(name: String, completion: @escaping (String?) -> Void) throws {
         var token: String? = nil
         var poolID: String? = nil
 
         // Iterate over the identity pools until a match is found.
         repeat {
-
+            var error: Error?
+            
             /// `token` is a value returned by `ListIdentityPools()` if the returned list
             /// of identity pools is only a partial list. You use the `token` to tell Cognito that
             /// you want to continue where you left off previously; specifying `nil` or not providing
@@ -53,26 +53,18 @@ class CognitoIdentityDemo {
             cognitoIdentityClient.listIdentityPools(input: listPoolsInput) { (result) in
                 switch(result) {
                 case .success(let output):
-                    if let identityPools = output.identityPools {
-                        let foundID = identityPools.filter {
-                            $0.identityPoolName == name
-                        }
-                        .map {
-                            $0.identityPoolId
-                        }
+                    poolID = output.identityPools?
+                        .filter { $0.identityPoolName == name }
+                        .map { $0.identityPoolId }
                         .first ?? nil
-                        
-                        if let foundID = foundID {
-                            poolID = foundID
-                        }
-                    }
-                    
                     token = output.nextToken
-                case .failure(let error):
-                    print("ERROR: ", dump(error, name: "Error scanning identity pools"))
-                    token = nil
-                    poolID = nil
+                case .failure(let listError):
+                    error = listError
                 }
+            }
+
+            if error != nil {
+                throw(error!)
             }
         } while token != nil && poolID == nil
         
@@ -84,19 +76,24 @@ class CognitoIdentityDemo {
     ///   - name: The name of the identity pool whose ID should be returned
     /// - Returns: A string containing the ID of the specified identity pool or `nil` on error or if not found
     func getIdentityPoolID(name: String, createIfMissing: Bool = false,
-                           completion: @escaping (String?) -> Void) {
+                           completion: @escaping (String?) -> Void) throws {
         // See if the pool already exists
         
-        self.getIdentityPoolID(name: name) { foundID in
-            if let foundID = foundID {
-                completion(foundID)
-            } else if createIfMissing {
-                self.createIdentityPool(name: name, completion: completion)
-            } else {
-                completion(nil)
+        do {
+            try self.getIdentityPoolID(name: name) { foundID in
+                if let foundID = foundID {
+                    completion(foundID)
+                } else if createIfMissing {
+                    self.createIdentityPool(name: name, completion: completion)
+                } else {
+                    completion(nil)
+                }
             }
+        } catch {
+            throw(error)
         }
-}
+    }
+
     
     /// Create a new identity pool, returning its ID.
     /// - Parameters:
