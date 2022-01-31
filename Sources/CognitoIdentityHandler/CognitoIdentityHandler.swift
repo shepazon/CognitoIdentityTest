@@ -10,13 +10,13 @@ import AWSCognitoIdentity
 import ClientRuntime
 
 /// A class containing all the code that interacts with the AWS SDK for Swift.
-class CognitoIdentityDemo {
+public class CognitoIdentityHandler {
     let cognitoIdentityClient: CognitoIdentityClient
     
     /// Initialize and return a new ``CognitoIdentityDemo`` object, which is used to drive the AWS calls
     /// used for the example.
     /// - Returns: A new ``CognitoIdentityDemo`` object, ready to run the demo code.
-    init() {
+    public init() {
         SDKLoggingSystem.add(logHandlerFactory: CognitoIdentityClientLogHandlerFactory(logLevel: .info))
         
         do {
@@ -90,17 +90,17 @@ class CognitoIdentityDemo {
     /// - Parameters:
     ///   - name: The name of the identity pool whose ID should be returned
     /// - Returns: A string containing the ID of the specified identity pool or `nil` on error or if not found
-    func getOrCreateIdentityPoolID(name: String) async throws -> String? {
+    public func getOrCreateIdentityPoolID(name: String) async throws -> String? {
         // See if the pool already exists
         
         do {
-            let poolId = try await self.getIdentityPoolID(name: name)
-            if let poolId = poolId {
-                return poolId
-            } else {
+            guard let poolId = try await self.getIdentityPoolID(name: name) else {
                 let poolId = try await self.createIdentityPool(name: name)
                 return poolId
             }
+      
+            return poolId
+           
         } catch {
             print("ERROR: ", dump(error, name: "Trying to get the identity pool ID"))
             return nil
@@ -113,16 +113,17 @@ class CognitoIdentityDemo {
     /// - Returns: A string containing the newly created pool's ID, or `nil` if an error occurred
     func createIdentityPool(name: String) async throws -> String? {
         
-        let cognitoInputCall = CreateIdentityPoolInput(
-            developerProviderName: "com.exampleco.CognitoIdentityDemo",
-            identityPoolName: name
-        )
+        let cognitoInputCall = CreateIdentityPoolInput(developerProviderName: "com.exampleco.CognitoIdentityDemo",
+                                                       identityPoolName: name)
         
         do {
             let result = try await cognitoIdentityClient.createIdentityPool(input: cognitoInputCall)
-            if let poolId = result.identityPoolId {
-                return poolId
+            guard let poolId = result.identityPoolId  else {
+                return nil
             }
+            
+            return poolId
+            
         } catch {
             print("ERROR: ", dump(error, name: "Error attempting to create the identity pool"))
         }

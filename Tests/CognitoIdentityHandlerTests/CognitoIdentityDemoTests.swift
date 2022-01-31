@@ -1,14 +1,14 @@
 import XCTest
 import class Foundation.Bundle
-@testable import CognitoIdentityDemo
+@testable import CognitoIdentityHandler
 
 /// Class based on `XCTestCase` that's run to perform testing of the project code.
 final class CognitoIdentityDemoTests: XCTestCase {
-    var identityTester: CognitoIdentityDemo? = nil
+    var identityTester: CognitoIdentityHandler? = nil
     
     /// Perform setup work needed by all tests.
     override func setUp() {
-        identityTester = CognitoIdentityDemo()
+        identityTester = CognitoIdentityHandler()
     }
     
     /// **Test:** Attempt to find an identity pool that doesn't exist. If no error occurs, the test
