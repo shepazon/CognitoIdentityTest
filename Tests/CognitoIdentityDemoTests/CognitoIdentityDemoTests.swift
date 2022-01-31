@@ -18,19 +18,27 @@ final class CognitoIdentityDemoTests: XCTestCase {
     
     /// **Test:** Attempt to find an identity pool that doesn't exist. If no error occurs, the test
     /// fails.
-    func testFindNonexistent() {
-        let poolID = identityTester?.getIdentityPoolID(name: "BogusPoolIsBogus", createIfMissing: false)
-        XCTAssertNil(poolID, "Found identity pool that does not exist")
+    func testFindNonexistent() throws {
+        try identityTester?.getIdentityPoolID(name: "BogusPoolIsBogus", createIfMissing: false) { poolID in
+            XCTAssertNil(poolID, "Found identity pool that does not exist")
+        }
     }
     
     /// **Test:** Create (or locate, if it already exists) an identity pool. Then try to find it
     /// a second time.. Make sure the returned IDs match. If not, the test fails.
-    func testCreateThenFind() {
-        let firstPoolID = identityTester!.getIdentityPoolID(name: "testCreateThenFind", createIfMissing: true)
-        XCTAssertNotNil(firstPoolID, "Unable to create or obtain test pool")
+    func testCreateThenFind() throws  {
+        var firstPoolID: String?
+        var secondPoolID: String?
         
-        let secondPoolID = identityTester?.getIdentityPoolID(name: "testCreateThenFind", createIfMissing: false)
-        XCTAssertNotNil(secondPoolID, "Unable to find test pool")
-        XCTAssertTrue(firstPoolID == secondPoolID, "Found pool ID doesn't match created pool ID")
+        try identityTester?.getIdentityPoolID(name: "testCreateThenFind", createIfMissing: true) { poolID in
+            firstPoolID = poolID
+            XCTAssertNotNil(firstPoolID, "Unable to create or obtain test pool")
+        }
+        
+        try identityTester?.getIdentityPoolID(name: "testCreateThenFind", createIfMissing: false) { poolID in
+            secondPoolID = poolID
+            XCTAssertNotNil(secondPoolID, "Unable to find test pool")
+            XCTAssertTrue(firstPoolID == secondPoolID, "Found pool ID doesn't match created pool ID")
+        }
     }
 }

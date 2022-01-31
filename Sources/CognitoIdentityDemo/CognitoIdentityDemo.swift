@@ -1,13 +1,14 @@
 //
-//  CognitoIdentityTest.swift
-//  
+// Copyright Amazon.com Inc. or its affiliates.
+// All Rights Reserved.
 //
-//  Created by Shepherd, Eric on 9/9/21.
+// SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation
-import AWSCognitoIdentity
 import ClientRuntime
+import AWSClientRuntime
+import AWSCognitoIdentity
 
 /// A class containing all the code that interacts with the AWS SDK for Swift.
 class CognitoIdentityDemo {
@@ -17,19 +18,25 @@ class CognitoIdentityDemo {
     /// used for the example.
     /// - Returns: A new ``CognitoIdentityDemo`` object, ready to run the demo code.
     init() throws {
-        SDKLoggingSystem.add(logHandlerFactory: CognitoIdentityClientLogHandlerFactory(logLevel: .info))
         cognitoIdentityClient = try CognitoIdentityClient()
     }
     
-    /// Returns the ID of the identity pool with the specified name.
+    /// Returns the ID of the identity pool with the specified name by calling the completion handler with
+    /// the found ID.
     /// - Parameters:
     ///   - name: The name of the identity pool whose ID should be returned
     /// - Returns: A string containing the ID of the specified identity pool or `nil` on error or if not found
-    func getIdentityPoolID(name: String, completion: @escaping (String?) -> Void) {
+    ///
+    /// - Note: The completion handler's parameters are the found ID (or `nil` if not found) and the
+    ///     next token if the search isn't finished yet.
+    func getIdentityPoolID(name: String, completion: @escaping (String?) -> Void) throws {
         var token: String? = nil
-        
+        var poolID: String? = nil
+
         // Iterate over the identity pools until a match is found.
         repeat {
+            var error: Error?
+            
             /// `token` is a value returned by `ListIdentityPools()` if the returned list
             /// of identity pools is only a partial list. You use the `token` to tell Cognito that
             /// you want to continue where you left off previously; specifying `nil` or not providing
@@ -46,67 +53,67 @@ class CognitoIdentityDemo {
             cognitoIdentityClient.listIdentityPools(input: listPoolsInput) { (result) in
                 switch(result) {
                 case .success(let output):
-                    if let identityPools = output.identityPools {
-                        for pool in identityPools {
-                            if pool.identityPoolName == name,
-                               let poolId = pool.identityPoolId {
-                                completion(poolId)
-                                break
-                            }
-                        }
-                    }
-                    
+                    poolID = output.identityPools?
+                        .filter { $0.identityPoolName == name }
+                        .map { $0.identityPoolId }
+                        .first ?? nil
                     token = output.nextToken
-                case .failure(let error):
-                    completion(nil)
-                    print("ERROR: ", dump(error, name: "Error scanning identity pools"))
+                case .failure(let listError):
+                    error = listError
                 }
             }
-        } while token != nil
+
+            if error != nil {
+                throw(error!)
+            }
+        } while token != nil && poolID == nil
         
-        completion(nil)
+        completion(poolID)
     }
     
     /// Returns the ID of the identity pool with the specified name.
     /// - Parameters:
     ///   - name: The name of the identity pool whose ID should be returned
     /// - Returns: A string containing the ID of the specified identity pool or `nil` on error or if not found
-    func getIdentityPoolID(name: String,
-                           completion: @escaping (String?) -> Void) {
+    func getIdentityPoolID(name: String, createIfMissing: Bool = false,
+                           completion: @escaping (String?) -> Void) throws {
         // See if the pool already exists
         
-        self.getIdentityPoolID(name: name) { poolId in
-            if let poolId = poolId {
-                completion(poolId)
-            } else {
-                self.createIdentityPool(name: name) { poolId in
-                    completion(poolId)
+        do {
+            try self.getIdentityPoolID(name: name) { foundID in
+                if let foundID = foundID {
+                    completion(foundID)
+                } else if createIfMissing {
+                    self.createIdentityPool(name: name, completion: completion)
+                } else {
+                    completion(nil)
                 }
             }
+        } catch {
+            throw(error)
         }
     }
+
     
     /// Create a new identity pool, returning its ID.
     /// - Parameters:
     ///     - name: The name to give the new identity pool
     /// - Returns: A string containing the newly created pool's ID, or `nil` if an error occurred
     func createIdentityPool(name: String, completion: @escaping (String?) -> Void) {
-        
         let cognitoInputCall = CreateIdentityPoolInput(
             developerProviderName: "com.exampleco.CognitoIdentityDemo",
             identityPoolName: name
         )
         
-        cognitoIdentityClient.createIdentityPool(input: cognitoInputCall) { (result) in
+        cognitoIdentityClient.createIdentityPool(input: cognitoInputCall) { result in
             switch(result) {
             case .success(let output):
-                if let poolId = output.identityPoolId {
-                    completion(poolId)
+                if let poolID = output.identityPoolId {
+                    completion(poolID)
                 }
-                completion(nil)
             case .failure(let error):
-                completion(nil)
                 print("ERROR: ", dump(error, name: "Error attempting to create the identity pool"))
+                completion(nil)
             }
         }
     }

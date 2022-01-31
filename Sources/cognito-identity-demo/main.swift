@@ -1,3 +1,10 @@
+//
+// Copyright Amazon.com Inc. or its affiliates.
+// All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
 import Foundation
 import AWSCognitoIdentity
 @testable import CognitoIdentityDemo
@@ -9,7 +16,8 @@ do {
     let identityDemo = try CognitoIdentityDemo()
     // Get the ID of the identity pool, creating it if necesssary
 
-    identityDemo.getIdentityPoolID(name: "SuperSpecialPool") { poolID in
+    try identityDemo.getIdentityPoolID(name: "SuperSpecialPool",
+                                   createIfMissing: true) { poolID in
         guard let poolID = poolID else {
             print("*** Unable to find or create SuperSpecialPool!")
             return
