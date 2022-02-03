@@ -1,18 +1,22 @@
+/*
+   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+   SPDX-License-Identifier: Apache-2.0
+*/
+
 import Foundation
 import CognitoIdentityHandler
 
 // Instantiate the main identity functions object
 
 @main
-struct DemoApp {
+struct CognitoIdentityDemo {
     static func main() async {
         
         let identityDemo = CognitoIdentityHandler()
-        print("Got identity client")
+
         // Get the ID of the identity pool, creating it if necesssary
 
         do {
-            print("Calling getOrCreateIdentityPoolID")
             guard let poolID = try await identityDemo.getOrCreateIdentityPoolID(name: "SuperSpecialPool") else {
                 print("*** Unable to find or create SuperSpecialPool!")
                 exit(1)

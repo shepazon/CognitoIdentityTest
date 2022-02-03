@@ -1,9 +1,7 @@
-//
-//  CognitoIdentityTest.swift
-//  
-//
-//  Created by Shepherd, Eric on 9/9/21.
-//
+/*
+   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+   SPDX-License-Identifier: Apache-2.0
+*/
 
 import Foundation
 import AWSCognitoIdentity
@@ -13,12 +11,10 @@ import ClientRuntime
 public class CognitoIdentityHandler {
     let cognitoIdentityClient: CognitoIdentityClient
     
-    /// Initialize and return a new ``CognitoIdentityDemo`` object, which is used to drive the AWS calls
+    /// Initialize and return a new ``CognitoIdentityHandler`` object, which is used to drive the AWS calls
     /// used for the example.
-    /// - Returns: A new ``CognitoIdentityDemo`` object, ready to run the demo code.
+    /// - Returns: A new ``CognitoIdentityHandler`` object, ready to run the demo code.
     public init() {
-        SDKLoggingSystem.add(logHandlerFactory: CognitoIdentityClientLogHandlerFactory(logLevel: .info))
-        
         do {
             cognitoIdentityClient = try CognitoIdentityClient()
         } catch {
@@ -64,23 +60,6 @@ public class CognitoIdentityHandler {
             } catch {
                 print("ERROR: ", dump(error, name: "Trying to get list of identity pools"))
             }
-//            switch(result) {
-//            case .success(let output):
-//                if let identityPools = output.identityPools {
-//                    for pool in identityPools {
-//                        if pool.identityPoolName == name,
-//                           let poolId = pool.identityPoolId {
-//                            completion(poolId)
-//                            break
-//                        }
-//                    }
-//                }
-//
-//                token = output.nextToken
-//            case .failure(let error):
-//                completion(nil)
-//                print("ERROR: ", dump(error, name: "Error scanning identity pools"))
-//            }
         } while token != nil
         
         return nil
@@ -112,7 +91,6 @@ public class CognitoIdentityHandler {
     ///     - name: The name to give the new identity pool
     /// - Returns: A string containing the newly created pool's ID, or `nil` if an error occurred
     func createIdentityPool(name: String) async throws -> String? {
-        
         let cognitoInputCall = CreateIdentityPoolInput(developerProviderName: "com.exampleco.CognitoIdentityDemo",
                                                        identityPoolName: name)
         
@@ -131,4 +109,3 @@ public class CognitoIdentityHandler {
         return nil
     }
 }
-

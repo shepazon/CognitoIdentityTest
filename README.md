@@ -4,4 +4,10 @@ In this, the first example introduced in the _AWS SDK for Swift Developer's Guid
 
 ## For more information...
 
-For details and explanations of what you find here, see [Your first project with AWS SDK for Swift]() in the _AWS SDK for Swift Developer's Guide_.
+For details and explanations of what you find here, see [Getting started](https://docs.aws.amazon.com/sdk-for-swift/latest/developer-guide/getting-started.html) in the _AWS SDK for Swift Developer's Guide_.
+
+## License
+
+Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+SPDX-License-Identifier: *Apache-2.0*
+See [the included license](LICENSE.md) for details.

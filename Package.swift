@@ -1,17 +1,21 @@
 // swift-tools-version:5.5
 // The swift-tools-version declares the minimum version of Swift required to build this package.
+/*
+   Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+   SPDX-License-Identifier: Apache-2.0
+*/
 
 import PackageDescription
 
 let package = Package(
-    name: "cognito-identity-demo",
+    name: "CognitoIdentityDemo",
     platforms: [
-        .macOS(.v12), //this needs to change to v11 once async is merged FYI
+        .macOS(.11),
         .iOS(.v13)
     ],
     products: [
       .library(name: "CognitoIdentityHandler", targets: ["CognitoIdentityHandler"]),
-      .executable(name: "CognitoIdentityDemo", targets: ["cognito-identity-demo"])
+      .executable(name: "CognitoIdentityDemo", targets: ["CognitoIdentityDemo"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -34,18 +38,18 @@ let package = Package(
         .testTarget(
             name: "CognitoIdentityHandlerTests",
             dependencies: [
-                "cognito-identity-demo",
+                "CognitoIdentityDemo",
                 .product(name: "AWSCognitoIdentity", package: "AWSSwiftSDK"),
             ],
             path: "./Tests/CognitoIdentityHandlerTests"
         ),
         // The target of the main executable program
         .executableTarget(
-            name: "cognito-identity-demo",
+            name: "CognitoIdentityDemo",
             dependencies: [
                 "CognitoIdentityHandler"
             ],
-            path: "./Sources/cognito-identity-demo"
+            path: "./Sources/CognitoIdentityDemo"
         ),
     ]
 )
